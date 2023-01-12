@@ -15,6 +15,7 @@
     <description>demo-native</description>
     <properties>
         <java.version>17</java.version>
+        <spring-boot.build-image.imageName>mikevivi/spring-boot-native-app</spring-boot.build-image.imageName>
     </properties>
     <dependencies>
         <dependency>
