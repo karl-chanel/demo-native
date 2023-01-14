@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -25,9 +28,11 @@ import java.util.Map;
 public class DemoNativeApplication {
 
     private int count;
+    private final DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
     public static void main(String[] args) {
         SpringApplication.run(DemoNativeApplication.class, args);
+        System.out.println(Arrays.toString(args));
     }
     @GetMapping("/test")
     public String say(@RequestParam(required = false, name = "location") String location, HttpServletRequest httpServletRequest) {
@@ -151,6 +156,6 @@ public class DemoNativeApplication {
 
                 "</table>\n" +
                 "</body></html>");
-        System.out.println("test");
+        log.info("visited time : "+ dateTimeFormatter.format(LocalDateTime.now()));
     }
 }
