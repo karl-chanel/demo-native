@@ -10,12 +10,12 @@
     </parent>
     <groupId>com.example</groupId>
     <artifactId>demo-native</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.18-SNAPSHOT</version>
     <name>demo-native</name>
     <description>demo-native</description>
     <properties>
         <java.version>17</java.version>
-<!--        <spring-boot.build-image.imageName>mikevivi/spring-boot-native-app</spring-boot.build-image.imageName>-->
+        <!--        <spring-boot.build-image.imageName>mikevivi/spring-boot-native-app</spring-boot.build-image.imageName>-->
     </properties>
     <dependencies>
         <dependency>
@@ -39,26 +39,104 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.graalvm.buildtools</groupId>
-                <artifactId>native-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                    <imageName>app-jvm-based</imageName>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <profiles>
+        <profile>
+            <id>jvm</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok</artifactId>
+                                </exclude>
+                            </excludes>
+                            <image>
+                                <!--配置镜像名称-->
+                                <name>
+                                    registry.cn-qingdao.aliyuncs.com/karl-chanel/${project.name}-jvm-based:${project.version}
+                                </name>
+                                <!--镜像打包完成后自动推送到镜像仓库-->
+                                <publish>true</publish>
+                                <env>
+                                    <BP_JVM_VERSION>17</BP_JVM_VERSION>
+                                    <BPE_DELIM_JAVA_TOOL_OPTIONS xml:space="preserve"> </BPE_DELIM_JAVA_TOOL_OPTIONS>
+                                    <BPE_APPEND_JAVA_TOOL_OPTIONS>
+                                        -Xms256m
+                                        -Xmx256m
+                                        -Xss256k
+                                        -XX:+UseZGC
+                                        -XX:CompileThreshold=500
+                                        -XX:+PrintGC
+                                    </BPE_APPEND_JAVA_TOOL_OPTIONS>
+                                </env>
+                            </image>
+                            <docker>
+                                <!--Docker远程管理地址-->
+                                <host>tcp://localhost:2375</host>
+                                <!--不使用TLS访问-->
+                                <tlsVerify>false</tlsVerify>
+                                <!--Docker推送镜像仓库配置-->
+                                <publishRegistry>
+                                    <!--推送镜像仓库用户名-->
+                                    <username>刘盼望88</username>
+                                    <!--推送镜像仓库密码-->
+                                    <password>2119994705lrw</password>
+                                    <!--推送镜像仓库地址-->
+                                    <url>https://registry.cn-qingdao.aliyuncs.com/karl-chanel</url>
+                                </publishRegistry>
+                            </docker>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+
+        </profile>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <image>
+                                <publish>true</publish>
+                                <name>
+                                    registry.cn-qingdao.aliyuncs.com/karl-chanel/${project.name}-platform-spec:${project.version}
+                                </name>
+                            </image>
+                            <docker>
+                                <!--Docker远程管理地址-->
+                                <host>tcp://localhost:2375</host>
+                                <!--不使用TLS访问-->
+                                <tlsVerify>false</tlsVerify>
+                                <!--Docker推送镜像仓库配置-->
+                                <publishRegistry>
+                                    <!--推送镜像仓库用户名-->
+                                    <username>刘盼望88</username>
+                                    <!--推送镜像仓库密码-->
+                                    <password>2119994705lrw</password>
+                                    <!--推送镜像仓库地址-->
+                                    <url>https://registry.cn-qingdao.aliyuncs.com/karl-chanel</url>
+                                </publishRegistry>
+                            </docker>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

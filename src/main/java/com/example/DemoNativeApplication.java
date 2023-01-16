@@ -1,5 +1,6 @@
 package com.example;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,12 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @SpringBootApplication
@@ -33,6 +37,30 @@ public class DemoNativeApplication {
     public static void main(String[] args) {
         SpringApplication.run(DemoNativeApplication.class, args);
         System.out.println(Arrays.toString(args));
+
+        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        List<String> arguments = runtimeMXBean.getInputArguments();
+        for (String argument : arguments) {
+            System.out.println(argument);
+        }
+        // jvmName
+        System.out.printf("jvmName: %s %n", runtimeMXBean.getVmName());
+        // jvmVersion
+        System.out.printf("jvmVersion: %s %n", runtimeMXBean.getVmVersion());
+        // jvmVendor
+        System.out.printf("jvmVendor: %s %n", runtimeMXBean.getVmVendor());
+        // startTime 使用hutool中DateUtil进行转换
+//        long startTime = runtimeMXBean.getStartTime();
+//        System.out.printf("startTime: %s %n", DateUtil.date(startTime).toString());
+        // classPath
+//        System.out.printf("classPath: %s %n", runtimeMXBean.getClassPath());
+        // systemProperties
+        System.out.printf("jvmName: %s %n", runtimeMXBean.getSystemProperties());
+        // bootClassPath
+//        System.out.printf("bootClassPath: %s %n", runtimeMXBean.getBootClassPath());
+        // processId
+//        System.out.printf("processId: %s %n", runtimeMXBean.getName().split("@")[0]);
+
     }
     @GetMapping("/test")
     public String say(@RequestParam(required = false, name = "location") String location, HttpServletRequest httpServletRequest) {
