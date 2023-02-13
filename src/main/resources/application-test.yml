@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:mysql://47.57.68.189:3306/test
+    username: root
+    password: 123456
+#  h2:
+#    console:
+#      enabled: true
+#      path: /h2
+#      settings:
+#        web-allow-others: true
+#  sql:
+#    init:
+#      schema-locations: classpath:db-mybatis/schema-h2.sql
+#      data-locations: classpath:db-mybatis/data-h2.sql
+#      platform: mysql
+#      mode: always
+  main:
+    banner-mode: off
+  output:
+    ansi:
+      enabled: always
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  mapper-locations: classpath:mapper/*.xml

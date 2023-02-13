@@ -3,8 +3,8 @@ package com.example;
 import cn.hutool.core.util.ReflectUtil;
 import com.example.anno.Log;
 import com.example.controller.HelloController;
-import com.example.entity.User;
-import com.example.property.MyCustomProperties;
+import com.example.dao.User_Batia_Mapper;
+import com.example.entity.User_Batis;
 import com.example.reflectdemo.ReflectCaseDemo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aot.hint.ExecutableMode;
@@ -16,14 +16,96 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.availability.ApplicationAvailability;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.ImportRuntimeHints;
+import org.springframework.scheduling.annotation.EnableAsync;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 
+class HintsDemo {
+
+    public static void main(String[] args) {
+        var list = getList();
+    }
+
+    private static List<String> getList() {
+        return Arrays.asList("hello", "world");
+    }
+}
+
+@EnableAspectJAutoProxy
+@SpringBootApplication
+@Slf4j
+@EnableAsync
+@ServletComponentScan
+@ImportRuntimeHints({MyCustomerControllerRuntimeHints.class})
+public class DemoNativeApplication {
+    public static Class<?> Class;
+    public static Method method;
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+    private int count;
+    private ReflectCaseDemo reflectCaseDemo;
+
+    public static void main(String[] args) {
+//        SpringApplication application = new SpringApplication(DemoNativeApplication.class);
+//        ConfigurableApplicationContext context = application.run(args);
+        ConfigurableApplicationContext run = SpringApplication.run(DemoNativeApplication.class, args);
+//        operateDb(context);
+
+//        System.out.println(context.getBean(TestBean.class));
+//        System.out.println(context.getBean("myfilter"));
+//        System.out.println(context.getBean("hola"));
+//        Thread.currentThread().setName("hello");
+//        System.out.println(context.getBean("ho"));
+//        getRunTimeInfo();
+    }
+
+    private static void operateDb(ConfigurableApplicationContext context) {
+        User_Batia_Mapper bean = context.getBean(User_Batia_Mapper.class);
+        System.out.println(bean.getById(2));
+        User_Batis userBatis = new User_Batis();
+        userBatis.setUsername("amy");
+        userBatis.setPassword("535177972");
+        int i = bean.insert(userBatis);
+        bean.update(5, new User_Batis("ron processly","21158492"));
+    }
+
+    private static void getRunTimeInfo() {
+        StringBuilder sb = new StringBuilder();
+        RuntimeMXBean mb = ManagementFactory.getRuntimeMXBean();
+        if (mb != null) {
+            sb.append(String.format("Java Name: %s\n", mb.getVmName()));
+            sb.append(String.format("Java Version: %s\n", mb.getVmVersion()));
+            sb.append(String.format("Java Vendor: %s\n", mb.getVmVendor()));
+            sb.append(String.format("Uptime: %s milliseconds\n", mb.getUptime()));
+            sb.append(String.format("PID: %s\n", mb.getPid()));
+            if (!mb.getInputArguments().isEmpty()) {
+                sb.append("Input Arguments:");
+                String cp = String.join("\n    ", mb.getInputArguments());
+                sb.append("\n    ").append(cp).append("\n");
+            }
+            if (mb.isBootClassPathSupported()) {
+                sb.append("Boot Classpath:");
+                String cp = String.join("\n    ", mb.getBootClassPath().split("[:|;]"));
+                sb.append("\n    ").append(cp).append("\n");
+            }
+            sb.append("Classpath:");
+            String cp = String.join("\n    ", mb.getClassPath().split(";"));
+            sb.append("\n    ").append(cp).append("\n");
+        }
+        System.out.println(sb.toString());
+    }
+    
+
+}
 class MyCustomerControllerRuntimeHints implements RuntimeHintsRegistrar {
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
@@ -35,54 +117,4 @@ class MyCustomerControllerRuntimeHints implements RuntimeHintsRegistrar {
     }
 }
 
-@EnableAspectJAutoProxy
-@SpringBootApplication
-@Slf4j
-@ImportRuntimeHints(MyCustomerControllerRuntimeHints.class)
-public class DemoNativeApplication {
-    public static Class<?> Class;
-    public static Method method;
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-    private int count;
-    private ReflectCaseDemo reflectCaseDemo;
-
-    public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(DemoNativeApplication.class, args);
-        MyCustomProperties myconfig = (MyCustomProperties) context.getBean("myCustomProperties");
-        System.out.println(myconfig);
-        User userBean = (User) context.getBean("user");
-        System.out.println(userBean.getAddress());
-//        Arrays.stream(context.getBeanDefinitionNames()).filter((n) -> {
-//            return n.startsWith("m");
-//        }).forEach(System.out::println);
-//        MyCustomProperties bean = (MyCustomProperties) context.getBean("myCustomProperties");
-//        System.out.println(bean.getAge());
-//        System.out.println(bean.getName());
-//        System.out.println(Arrays.toString(args));
-//        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-//        List<String> arguments = runtimeMXBean.getInputArguments();
-//        for (String argument : arguments) {
-//            System.out.println(argument);
-//        }
-//        // jvmName
-//        System.out.printf("jvmName: %s %n", runtimeMXBean.getVmName());
-//        // jvmVersion
-//        System.out.printf("jvmVersion: %s %n", runtimeMXBean.getVmVersion());
-//        // jvmVendor
-//        System.out.printf("jvmVendor: %s %n", runtimeMXBean.getVmVendor());
-
-
-        // startTime 使用hutool中DateUtil进行转换
-//        long startTime = runtimeMXBean.getStartTime();
-//        System.out.printf("startTime: %s %n", DateUtil.date(startTime).toString());
-        // classPath
-//        System.out.printf("classPath: %s %n", runtimeMXBean.getClassPath());
-        // systemProperties
-//        System.out.printf("jvmName: %s %n", runtimeMXBean.getSystemProperties());
-        // bootClassPath
-//        System.out.printf("bootClassPath: %s %n", runtimeMXBean.getBootClassPath());
-        // processId
-//        System.out.printf("processId: %s %n", runtimeMXBean.getName().split("@")[0]);
-    }
-}
 

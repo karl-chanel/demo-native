@@ -16,4 +16,5 @@ public class PayLoad {
     private String location;
     private Integer age;
     private String who;
+    private User user;
 }

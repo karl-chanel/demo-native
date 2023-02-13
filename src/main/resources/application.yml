@@ -1,30 +1,31 @@
 my:
   config:
-    age: 100
+    age: 20
     enable: true
-    name: jasper
+    name: karl
 server:
   port: 8090
 spring:
-  datasource:
-    driverClassName: org.h2.Driver
-    password: sa
-    url: jdbc:h2:mem:dbtest
-    username: sa
-  h2:
-    console:
-      enabled: true
-      path: /h2
-      settings:
-        web-allow-others: true
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-  main:
-    banner-mode: false
-  sql:
-    init:
-      data-locations: classpath:db/data.sql
-      platform: h2
-      schema-locations: classpath:db/schema.sql
+  profiles:
+    active: test
+#  datasource:
+#    password: sa
+#    url: jdbc:h2:mem:dbtest
+#    username: sa
+#  h2:
+#    console:
+#      enabled: true
+#      path: /h2
+#      settings:
+#        web-allow-others: true
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#  main:
+#    banner-mode: off
+#  sql:
+#    init:
+#      data-locations: classpath:db/data.sql
+#      platform: h2
+#      schema-locations: classpath:db/schema.sql

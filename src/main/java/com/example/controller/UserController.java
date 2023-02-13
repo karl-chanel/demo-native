@@ -2,7 +2,6 @@ package com.example.controller;
 
 import com.example.entity.User_H2;
 import com.example.service.impl.UserServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,8 +14,11 @@ import java.util.List;
 @RestController
 @RequestMapping("user")
 public class UserController {
-    @Autowired
-    private UserServiceImpl userService;
+    private final UserServiceImpl userService;
+
+    public UserController(UserServiceImpl userService) {
+        this.userService = userService;
+    }
 
     @RequestMapping("add")
     public User_H2 add(User_H2 user) {

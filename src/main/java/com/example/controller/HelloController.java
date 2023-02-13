@@ -6,6 +6,7 @@ import com.example.anno.Log;
 import com.example.entity.PayLoad;
 import com.example.entity.User;
 import com.example.reflectdemo.ReflectCaseDemo;
+import com.example.response.ResponseResult;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,22 +15,21 @@ import jakarta.servlet.http.HttpSession;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * @author jasper
@@ -42,12 +42,14 @@ import java.util.Map;
 public class HelloController {
     public static Class<?> aClass;
     public static Method method;
+    private final User user = new User("chanel", "anhui", 50);
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
     private int count;
     private ReflectCaseDemo reflectCaseDemo;
 
     @SneakyThrows
     private static void extracted() {
+
         val set = new HashSet<String>();
         PayLoad payLoad = PayLoad.builder().age(10).who("").location("").build();
         Class<?> name = Class.forName("com.example.reflectdemo.RfDemo2");
@@ -67,6 +69,31 @@ public class HelloController {
         main.invoke(null, (Object) new String[]{"sd", "svfds"});
     }
 
+    @GetMapping("/async-deferred-result")
+    public DeferredResult<ResponseEntity<?>> handleReqDefResult() {
+
+        log.info("Received async-deferred-result request");
+        DeferredResult<ResponseEntity<?>> output = new DeferredResult<>();
+
+        ForkJoinPool.commonPool().submit
+                (() -> {
+                    log.info("Processing in separate thread");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    output.setResult(ResponseEntity.ok("ok"));
+                });
+        log.info("servlet thread freed");
+        return output;
+
+    }
+
+    public void testHello() {
+        System.out.println("its gaga bitch !!!");
+    }
+
     @SneakyThrows
     @PostConstruct
     public void init() {
@@ -76,6 +103,33 @@ public class HelloController {
     }
 
     @SneakyThrows
+    @GetMapping("http_response")
+    public void tes(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        httpServletResponse.getWriter().println("hello from http response");
+    }
+
+    @GetMapping("/entity")
+    public ResponseEntity<List<PayLoad>> hello() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("mytag", "v1");
+        headers.set("time_now", LocalDateTime.now().toString());
+        List<PayLoad> list = new ArrayList<>();
+        PayLoad payLoad = new PayLoad("cdasc", 50, "cadsc", user);
+        PayLoad payLoad1 = new PayLoad("qwwq", 50, "cd", user);
+        PayLoad payLoad2 = new PayLoad("csdcds", 50, "dc", user);
+        list.add(payLoad);
+        list.add(payLoad1);
+        list.add(payLoad2);
+        list.stream().map(PayLoad::getWho).toList().forEach(System.out::println);
+        String[] strings = {"dsds", "freferf"};
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(list);
+    }
+
+    @SneakyThrows
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/json")
     public User json() {
         HelloController.method.invoke(reflectCaseDemo, Counter.count);
@@ -83,11 +137,26 @@ public class HelloController {
         return new User("in-side", "Beijing", 100);
     }
 
-    @GetMapping(value = "/test", produces = MediaType.APPLICATION_JSON_VALUE)
+    @SneakyThrows
+    @GetMapping("/data")
+    public ResponseResult<PayLoad> data() {
+        return ResponseResult.success(new PayLoad("ShangHai", 20, "karl", user));
+    }
+
+
+    @SneakyThrows
+    @GetMapping("/fail")
+    public ResponseResult<?> fail() {
+        return ResponseResult.fail("wrong call");
+    }
+
+    //    @GetMapping(value = "/test", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/test", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Log
     public PayLoad say(@RequestParam(required = false, name = "location") String location,
                        @RequestParam(required = false, name = "age") Integer age,
                        @RequestParam(required = false, name = "who") String who,
+
                        HttpServletRequest httpServletRequest) {
 
         Map<String, String[]> map = httpServletRequest.getParameterMap();
@@ -109,7 +178,8 @@ public class HelloController {
             location = "hebei";
         }
         log.info(String.valueOf(count));
-        return new PayLoad(location, age, who);
+        log.info(String.valueOf(count));
+        return new PayLoad(location, age, who, user);
     }
 
     @GetMapping("/hello")

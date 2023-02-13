@@ -1,0 +1,35 @@
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">-->
+<!--<mapper namespace="com.example.dao.User_Batia_Mapper">&lt;!&ndash;namespace是java interface和xml的匹配关系&ndash;&gt;-->
+<!--    <resultMap id="UserMap" type="com.example.entity.User_Batis">-->
+<!--        <id column="id" property="id" jdbcType="INTEGER"/>-->
+<!--        <result column="username" property="username" jdbcType="VARCHAR"/>-->
+<!--        <result column="password" property="password" jdbcType="VARCHAR"/>-->
+<!--    </resultMap>-->
+
+
+<!--        <select id="getById" resultMap="UserMap">-->
+<!--        select * from t_user where id = #{id}-->
+<!--    </select>-->
+
+<!--    <select id="getByUsername" resultMap="UserMap">-->
+<!--        select * from t_user where username = #{username}-->
+<!--    </select>-->
+
+<!--    <insert id="insert" parameterType="com.example.entity.User_Batis">-->
+<!--        insert into t_user ( id,username, password) values (#{id}, #{username}, #{password} )-->
+<!--    </insert>-->
+
+<!--    <delete id="delete">-->
+<!--        delete from t_user where id = #{id}-->
+<!--    </delete>-->
+
+<!--    <update id="update">-->
+<!--        update t_user-->
+<!--        <set>-->
+<!--            <if test="user.username != null">username = #{user.username},</if>-->
+<!--            <if test="user.password != null">password = #{user.password}</if>-->
+<!--        </set>-->
+<!--        where id = #{id}-->
+<!--    </update>-->
+<!--</mapper>-->
